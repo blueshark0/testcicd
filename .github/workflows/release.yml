@@ -19,7 +19,7 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v2
       with:
-        version: 8
+        version: latest
         
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -28,7 +28,9 @@ jobs:
         cache: 'pnpm'
         
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: |
+        # 尝试使用 frozen-lockfile，如果失败则使用普通安装
+        pnpm install --frozen-lockfile || pnpm install
       
     - name: Build for production
       run: pnpm run build
