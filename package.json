@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "echo 'ESLint not configured yet'",
+    "test": "echo 'Tests not configured yet'",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "vue": "^3.5.13"

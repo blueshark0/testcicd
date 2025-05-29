@@ -1,0 +1,59 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # 每周一的 UTC 时间 02:00 运行
+    - cron: '0 2 * * 1'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+        
+    - name: Update dependencies
+      run: |
+        pnpm update --latest
+        
+    - name: Check for changes
+      id: changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Pull Request
+      if: steps.changes.outputs.changes == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: 'chore: update dependencies'
+        body: |
+          ## 依赖项更新
+          
+          这个 PR 自动更新了项目依赖项到最新版本。
+          
+          请检查构建是否成功，并测试应用程序是否正常工作。
+          
+          - 自动生成于 ${{ github.run_id }}
+        branch: chore/update-dependencies
+        delete-branch: true
